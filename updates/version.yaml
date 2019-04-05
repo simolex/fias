@@ -1,0 +1,7 @@
+1.0.1: First version of fias
+1.0.2:
+    - 'Created table salxig_fias_fileinfo'
+    - create_fileinfos_table.php
+1.0.3:
+    - 'Created table salxig_fias_tables'
+    - create_fias_tables.php

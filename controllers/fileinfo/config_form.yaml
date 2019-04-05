@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Fileinfo
+
+# Model Form Field configuration
+form: $/salxig/fias/models/fileinfo/fields.yaml
+
+# Model Class name
+modelClass: Salxig\Fias\Models\Fileinfo
+
+# Default redirect location
+defaultRedirect: salxig/fias/fileinfo
+
+# Create page
+create:
+    title: Create Fileinfo
+    redirect: salxig/fias/fileinfo/update/:id
+    redirectClose: salxig/fias/fileinfo
+
+# Update page
+update:
+    title: Edit Fileinfo
+    redirect: salxig/fias/fileinfo
+    redirectClose: salxig/fias/fileinfo
+
+# Preview page
+preview:
+    title: Preview Fileinfo

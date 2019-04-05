@@ -1,0 +1,7 @@
+fields:
+    fias_wsdl_url:
+        label: 'Updates WSDL Service'
+        disabled: true
+        span: full
+        default: 'https://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL'
+        type: text
