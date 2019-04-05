@@ -1,7 +1,10 @@
 <?php namespace Salxig\Fias\Components;
 
 use Cms\Classes\ComponentBase;
-use SoapClient;
+
+use Artisaninweb\SoapWrapper\SoapWrapper;
+//use SoapClient;;
+
 use Request;
 
 
@@ -76,14 +79,23 @@ class Weather extends ComponentBase
     {
 
         $urlsoap = "https://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL";
-        $client = new SoapClient($urlsoap, [
+
+        $soapWrapper = new SoapWrapper();
+        $soapWrapper->add('Fias', function ($service) use ($urlsoap) {
+              $service->wsdl($urlsoap)
+                    ->trace(true);
+        });
+        /*$client = new SoapClient($urlsoap, [
                 'exceptions' => true,
                 'soap_version'   => SOAP_1_2,
             ]);
-        $res = $client->GetLastDownloadFileInfo();
+        $res = $client->GetLastDownloadFileInfo();*/
+
+        $res = $soapWrapper->call('Fias.GetLastDownloadFileInfo',[]);
 
         /*$json = file_get_contents(sprintf(
             "http://api.openweathermap.org/data/2.5/weather?q=%s,%s,%s&units=%s&id=524901&appid=b1b15e88fa797225412429c1c50c122a1",
+
             $this->property('city'),
             $this->property('state'),
             $this->property('country'),

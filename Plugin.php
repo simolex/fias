@@ -34,6 +34,7 @@ class Plugin extends PluginBase
      */
     public function register()
     {
+        $this->registerConsoleCommand('fias.database', 'Salxig\Fias\Console\FiasDatabase');
 
     }
 
@@ -53,11 +54,11 @@ class Plugin extends PluginBase
      * @see https://luketowers.ca/blog/how-to-use-laravel-packages-in-october-plugins
      * @author Luke Towers <octobercms@luketowers.ca>
      */
-
     public function bootPackages()
     {
         // Get the namespace of the current plugin to use in accessing the Config of the plugin
         $pluginNamespace = str_replace('\\', '.', strtolower(__NAMESPACE__));
+
 
         // Instantiate the AliasLoader for any aliases that will be loaded
         $aliasLoader = AliasLoader::getInstance();
@@ -125,6 +126,7 @@ class Plugin extends PluginBase
      */
     public function registerNavigation()
     {
+
         //return []; // Remove this line to activate
 
         return [
@@ -137,6 +139,7 @@ class Plugin extends PluginBase
             ],
         ];
     }
+
 
     public function registerSettings()
     {
@@ -152,5 +155,6 @@ class Plugin extends PluginBase
             ]
         ];
     }
+
 
 }
