@@ -43,7 +43,11 @@ class FiasDatabase extends Command
     protected function getOptions()
     {
         return [
-            ['version_x', 'x', InputOption::VALUE_OPTIONAL, 'Version DB FIAS.', 'max'],
+            ['version_num', 'vn', InputOption::VALUE_OPTIONAL, 'Version number DB FIAS.', 'max'],
+            ['version_date', 'vd', InputOption::VALUE_OPTIONAL, 'Date of version DB FIAS.', 'max'],
+            ['region_nums', 'rn',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Numbers of region DB FIAS.'],
         ];
     }
 }
