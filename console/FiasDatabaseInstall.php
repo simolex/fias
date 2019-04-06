@@ -4,17 +4,17 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class FiasDatabase extends Command
+class FiasDatabaseInstall extends Command
 {
     /**
      * @var string The console command name.
      */
-    protected $name = 'fias:database';
+    protected $name = 'fias:install';
 
     /**
      * @var string The console command description.
      */
-    protected $description = 'Install/Update FIAS database.';
+    protected $description = 'Install FIAS database.';
 
     /**
      * Execute the console command.
@@ -22,7 +22,10 @@ class FiasDatabase extends Command
      */
     public function handle()
     {
-        $this->output->writeln('Hello world!');
+
+        $options = $this->option();
+        $this->info(var_dump($options));
+
     }
 
     /**
@@ -31,9 +34,7 @@ class FiasDatabase extends Command
      */
     protected function getArguments()
     {
-        return [
-            ['action', InputArgument::OPTIONAL, '"install" or "update" database.','update'],
-        ];
+        return [];
     }
 
     /**
@@ -43,8 +44,8 @@ class FiasDatabase extends Command
     protected function getOptions()
     {
         return [
-            ['version_num', 'vn', InputOption::VALUE_OPTIONAL, 'Version number DB FIAS.', 'max'],
-            ['version_date', 'vd', InputOption::VALUE_OPTIONAL, 'Date of version DB FIAS.', 'max'],
+            ['version_num', 'vn', InputOption::VALUE_OPTIONAL, 'Version number DB FIAS.', 'last'],
+            ['version_date', 'vd', InputOption::VALUE_OPTIONAL, 'Date of version DB FIAS.', 'last'],
             ['region_nums', 'rn',
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'Numbers of region DB FIAS.'],
