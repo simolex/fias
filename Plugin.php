@@ -34,7 +34,10 @@ class Plugin extends PluginBase
      */
     public function register()
     {
-        $this->registerConsoleCommand('fias.database', 'Salxig\Fias\Console\FiasDatabase');
+        $this->registerConsoleCommand('fias.install', 'Salxig\Fias\Console\FiasDatabaseInstall');
+        $this->registerConsoleCommand('fias.delete', 'Salxig\Fias\Console\FiasDatabaseDelete');
+        $this->registerConsoleCommand('fias.update', 'Salxig\Fias\Console\FiasDatabaseUpdate');
+
 
     }
 
