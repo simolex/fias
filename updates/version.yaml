@@ -6,4 +6,5 @@
 1.0.3:
     - 'Created table salxig_fias_tables'
     - create_fias_tables.php
-
+1.0.4:
+    - 'Created console commands'

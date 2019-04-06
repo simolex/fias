@@ -102,7 +102,8 @@ class Weather extends ComponentBase
             $this->property('units')
         ));
 */
-        return $res->GetLastDownloadFileInfoResult->VersionId;//json_decode($json);
+        return $res->GetLastDownloadFileInfoResult->VersionId. ' - '.
+        $res->GetLastDownloadFileInfoResult->TextVersion;//json_decode($json);
     }
 
     public function onRun()

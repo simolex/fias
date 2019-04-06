@@ -23,8 +23,9 @@ class FiasDatabaseDelete extends Command
     public function handle()
     {
 
-        $options = $this->option();
-        $this->info(var_dump($options));
+        $region_nums = $this->option('region_nums');
+        //if(array_key_exists('region_nums'))
+        $this->info(var_dump($region_nums));
 
     }
 
@@ -45,7 +46,7 @@ class FiasDatabaseDelete extends Command
     {
         return [
             ['region_nums', 'rn',
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Numbers of region DB FIAS.'],
         ];
     }

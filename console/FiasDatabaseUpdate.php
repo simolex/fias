@@ -23,8 +23,10 @@ class FiasDatabaseUpdate extends Command
     public function handle()
     {
 
-        $options = $this->option();
-        $this->info(var_dump($options));
+        $region_nums = $this->option('region_nums');
+        $version_num = $this->option('version_num');
+        //if(array_key_exists('region_nums'))
+        $this->info(var_dump($region_nums));
 
     }
 
@@ -45,9 +47,9 @@ class FiasDatabaseUpdate extends Command
     {
         return [
             ['version_num', 'vn', InputOption::VALUE_OPTIONAL, 'Version number DB FIAS.', 'last'],
-            ['version_date', 'vd', InputOption::VALUE_OPTIONAL, 'Date of version DB FIAS.', 'last'],
+            //['version_date', 'vd', InputOption::VALUE_OPTIONAL, 'Date of version DB FIAS.', 'last'],
             ['region_nums', 'rn',
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'Numbers of region DB FIAS.'],
         ];
     }
