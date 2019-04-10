@@ -49,20 +49,20 @@ class CreateFiasTables extends Migration
             $table->uuid('parentguid')         // Идентификатор объекта родительского объекта
                     ->nullable();
             $table->uuid('aoid');              // Уникальный идентификатор записи. Ключевое поле.
-            $table->uuid('previd');            // Идентификатор записи связывания с предыдушей исторической записью
+            $table->uuid('previd')             // Идентификатор записи связывания с предыдушей исторической записью
                     ->nullable();
-            $table->uuid('nextid');            // Идентификатор записи  связывания с последующей исторической записью
+            $table->uuid('nextid')             // Идентификатор записи  связывания с последующей исторической записью
                     ->nullable();
-            $table->string('code', 17);        // Код адресного объекта одной строкой с признаком актуальности из КЛАДР 4.0.
+            $table->string('code', 17)         // Код адресного объекта одной строкой с признаком актуальности из КЛАДР 4.0.
                     ->nullable();
-            $table->string('plaincode', 15);   // Код адресного объекта из КЛАДР 4.0 одной строкой без признака актуальности (последних двух цифр)
+            $table->string('plaincode', 15)    // Код адресного объекта из КЛАДР 4.0 одной строкой без признака актуальности (последних двух цифр)
                     ->nullable();
-            $table->tinyInteger('actstatus');  // Статус актуальности адресного объекта ФИАС. Актуальный адрес на текущую дату. Обычно последняя запись об адресном объекте.
+            $table->tinyInteger('actstatus')   // Статус актуальности адресного объекта ФИАС. Актуальный адрес на текущую дату. Обычно последняя запись об адресном объекте.
                     ->unsigned();              //       0 – Не актуальный
                                                //       1 - Актуальный
-            $table->tinyInteger('centstatus'); // Статус центра
+            $table->tinyInteger('centstatus')  // Статус центра
                     ->unsigned();
-            $table->tinyInteger('operstatus'); // Статус действия над записью – причина появления записи (см. описание таблицы OperationStatus):
+            $table->tinyInteger('operstatus')  // Статус действия над записью – причина появления записи (см. описание таблицы OperationStatus):
                     ->unsigned();              //       01 – Инициация;
                                                //       10 – Добавление;
                                                //       20 – Изменение;
@@ -77,13 +77,13 @@ class CreateFiasTables extends Migration
                                                //       51 – Переподчинение вследствие переподчинения вышестоящего объекта;
                                                //       60 – Прекращение существования вследствие дробления;
                                                //       61 – Создание нового адресного объекта в результате дробления
-            $table->tinyInteger('currstatus'); // Статус актуальности КЛАДР 4
+            $table->tinyInteger('currstatus')  // Статус актуальности КЛАДР 4
                     ->unsigned();              //   (последние две цифры в коде)
             $table->date('startdate');         // Начало действия записи
             $table->date('enddate');           // Окончание действия записи
             $table->uuid('normdoc');           // Внешний ключ на нормативный документ
             $table->boolean('livestatus');     // Признак действующего адресного объекта
-            $table->tinyInteger('divtype');    // Тип адресации:
+            $table->tinyInteger('divtype')     // Тип адресации:
                     ->unsigned();              //       0 - не определено
                                                //       1 - муниципальный;
                                                //       2 - административно-территориальный
@@ -135,7 +135,7 @@ class CreateFiasTables extends Migration
                     ->unsigned();
             $table->string('cadnum', 100)      // Кадастровый номер
                     ->nullable();
-            $table->tinyInteger('divtype');    // Тип адресации:
+            $table->tinyInteger('divtype')     // Тип адресации:
                     ->unsigned();              //       0 - не определено
                                                //       1 - муниципальный;
                                                //       2 - административно-территориальный
@@ -173,7 +173,7 @@ class CreateFiasTables extends Migration
                     ->nullable();
             $table->uuid('nextid')             //Идентификатор записи  связывания с последующей исторической записью
                     ->nullable();
-            $table->tinyInteger('operstatus'); // Статус действия над записью – причина появления записи (см. описание таблицы OperationStatus):
+            $table->tinyInteger('operstatus')  // Статус действия над записью – причина появления записи (см. описание таблицы OperationStatus):
                     ->unsigned();              //       01 – Инициация;
                                                //       10 – Добавление;
                                                //       20 – Изменение;
@@ -195,7 +195,7 @@ class CreateFiasTables extends Migration
             $table->boolean('livestatus');     // Признак действующего адресного объекта
             $table->string('cadnum', 100)      // Кадастровый номер
                     ->nullable();
-            $table->tinyInteger('divtype');    // Тип адресации:
+            $table->tinyInteger('divtype')     // Тип адресации:
                     ->unsigned();              //       0 - не определено
                                                //       1 - муниципальный;
                                                //       2 - административно-территориальный
@@ -216,7 +216,7 @@ class CreateFiasTables extends Migration
                     ->nullable();
             $table->tinyInteger('roomtype')    // Тип комнаты
                     ->unsigned()
-                    ->nullable()
+                    ->nullable();
             $table->string('regioncode', 2);   // Код региона
             $table->string('postalcode', 6)    // Почтовый индекс
                     ->nullable();
@@ -232,7 +232,7 @@ class CreateFiasTables extends Migration
             $table->boolean('livestatus');     // Признак действующего адресного объекта
             $table->uuid('normdoc')            // Внешний ключ на нормативный документ
                     ->nullable();
-            $table->tinyInteger('operstatus'); // Статус действия над записью – причина появления записи (см. описание таблицы OperationStatus):
+            $table->tinyInteger('operstatus')  // Статус действия над записью – причина появления записи (см. описание таблицы OperationStatus):
                     ->unsigned();              //       01 – Инициация;
                                                //       10 – Добавление;
                                                //       20 – Изменение;
@@ -283,7 +283,7 @@ class CreateFiasTables extends Migration
             $table->engine = 'InnoDB';
 
             $table->tinyInteger('level');      // Уровень адресного объекта
-            $table->string('scname', 10);      // Краткое наименование типа объекта
+            $table->string('scname', 10)       // Краткое наименование типа объекта
                     ->nullable();
             $table->string('socrname', 50);    // Полное наименование типа объекта
             $table->string('kod_t_st', 4);     // Ключевое поле
@@ -296,7 +296,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_cur_statuses', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->tinyInteger('curentstid'); // Идентификатор статуса (ключ)
+            $table->tinyInteger('curentstid')  // Идентификатор статуса (ключ)
                     ->unsigned();
             $table->string('name', 100);       // Наименование (0 - актуальный,
                                                //       1-50, 52-98 – исторический,
@@ -310,7 +310,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_act_statuses', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->tinyInteger('actstatid');  // Идентификатор статуса (ключ)
+            $table->tinyInteger('actstatid')   // Идентификатор статуса (ключ)
                     ->unsigned();
             $table->string('name', 100);       // Наименование
                                                //       0 – Не актуальный
@@ -323,7 +323,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_oper_statuses', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->tinyInteger('operstatid');  // Идентификатор статуса (ключ)
+            $table->tinyInteger('operstatid')   // Идентификатор статуса (ключ)
                     ->unsigned();
             $table->string('name', 100);       // Наименование
                                                //       01 – Инициация;
@@ -350,7 +350,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_cnt_statuses', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->tinyInteger('centerstid'); // Идентификатор статуса (ключ)
+            $table->tinyInteger('centerstid')  // Идентификатор статуса (ключ)
                     ->unsigned();
             $table->string('name', 100);       // Наименование
 
@@ -362,7 +362,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_intv_statuses', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->tinyInteger('intvstatid'); // Идентификатор статуса (обычный, четный, нечетный)
+            $table->tinyInteger('intvstatid')  // Идентификатор статуса (обычный, четный, нечетный)
                     ->unsigned();
             $table->string('name', 60);        // Наименование
 
@@ -374,7 +374,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_hst_statuses', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->tinyInteger('housestid');  // Идентификатор статуса
+            $table->tinyInteger('housestid')   // Идентификатор статуса
                     ->unsigned();
             $table->string('name', 60);        // Наименование
 
@@ -386,7 +386,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_est_statuses', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->tinyInteger('eststatid');  // Признак владения
+            $table->tinyInteger('eststatid')   // Признак владения
                     ->unsigned();
             $table->string('name', 60);        // Наименование
             $table->string('shortname', 20)    // Краткое наименование
@@ -428,7 +428,7 @@ class CreateFiasTables extends Migration
         Schema::create('salxig_fias_ndoc_types', function(Blueprint $table) {
 
             $table->engine = 'InnoDB';
-            $table->smallInteger('ndtypeid');  // Идентификатор записи (ключ)
+            $table->smallInteger('ndtypeid')   // Идентификатор записи (ключ)
                     ->unsigned();
             $table->string('name', 250);       // Наименование типа нормативного документа
 
