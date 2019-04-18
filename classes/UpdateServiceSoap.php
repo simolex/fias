@@ -1,9 +1,11 @@
 <?php
 
 namespace Salxig\Fias\Classes;
-use Config;
+//use Config;
 use SoapClient;
 use Salxig\Fias\Contracts\UpdateService;
+use Salxig\Fias\Models\Settings;
+
 /**
  * Объекта, который обращается к сервису обновления ФИАС.
  */

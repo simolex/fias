@@ -50,6 +50,7 @@ class Plugin extends PluginBase
     public function boot()
     {
         App::register('Salxig\Fias\Provider\FiasServiceProvider');
+        
         $this->bootPackages();
     }
 
