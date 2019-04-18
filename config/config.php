@@ -1,10 +1,10 @@
 <?php return [
 
-    'settings' => [
-        'Updates_url'   => 'https://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL',
-        'Format'        => 'xml',
+    
+    'updateservice_wsdl'   => 'https://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL',
+    'updateservice_format'        => 'xml',
 
-    ],
+    
 
     // This contains the Laravel Packages that you want this plugin to utilize listed under their package identifiers
     'packages' => [

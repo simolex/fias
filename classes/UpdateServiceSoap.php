@@ -1,10 +1,9 @@
 <?php
 
-namespace Salxig\Fias\Contracts;
+namespace Salxig\Fias\Classes;
 use Config;
-
 use SoapClient;
-
+use Salxig\Fias\Contracts\UpdateService;
 /**
  * Объекта, который обращается к сервису обновления ФИАС.
  */
@@ -29,7 +28,7 @@ class UpdateServiceSoap implements UpdateService
      */
     public function __construct(SoapClient $soapClient = null)
     {
-        $fias_wsdl = Config::get(salxig.fias::settings.updates_url);
+        $fias_wsdl = Config::get('salxig.fias::updateservice_wsdl');
 
         if ($soapClient === null) {
             $soapClient = new SoapClient($fias_wsdl, [
@@ -73,11 +72,11 @@ class UpdateServiceSoap implements UpdateService
             if ($version['VersionId'] <= $fiasVersion) {
                 continue;
             }
-            $return = [
+            $return[] = [
                 'url' => $version['FiasDeltaXmlUrl'],
                 'version' => $version['VersionId'],
             ];
-            break;
+            //break;
         }
 
         return $return;

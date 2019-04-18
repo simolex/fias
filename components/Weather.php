@@ -1,6 +1,8 @@
 <?php namespace Salxig\Fias\Components;
 
 use Cms\Classes\ComponentBase;
+use App;
+use Config;
 
 use Artisaninweb\SoapWrapper\SoapWrapper;
 //use SoapClient;;
@@ -78,20 +80,20 @@ class Weather extends ComponentBase
     public function info()
     {
 
-        $urlsoap = "https://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL";
+        /*$urlsoap = "https://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL";
 
         $soapWrapper = new SoapWrapper();
         $soapWrapper->add('Fias', function ($service) use ($urlsoap) {
               $service->wsdl($urlsoap)
                     ->trace(true);
-        });
+        });*/
         /*$client = new SoapClient($urlsoap, [
                 'exceptions' => true,
                 'soap_version'   => SOAP_1_2,
             ]);
         $res = $client->GetLastDownloadFileInfo();*/
 
-        $res = $soapWrapper->call('Fias.GetLastDownloadFileInfo',[]);
+        /*$res = $soapWrapper->call('Fias.GetLastDownloadFileInfo',[]);*/
 
         /*$json = file_get_contents(sprintf(
             "http://api.openweathermap.org/data/2.5/weather?q=%s,%s,%s&units=%s&id=524901&appid=b1b15e88fa797225412429c1c50c122a1",
@@ -102,8 +104,12 @@ class Weather extends ComponentBase
             $this->property('units')
         ));
 */
-        return $res->GetLastDownloadFileInfoResult->VersionId. ' - '.
-        $res->GetLastDownloadFileInfoResult->TextVersion;//json_decode($json);
+        /*return $res->GetLastDownloadFileInfoResult->VersionId. ' - '.
+        $res->GetLastDownloadFileInfoResult->TextVersion;*///json_decode($json);
+
+        $soap = App::make('UpdateService');
+        $ret = $soap->getUrlForDeltaData(530);
+        return var_dump($ret);
     }
 
     public function onRun()
