@@ -12,7 +12,7 @@ class FiasServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->bind('UpdateService', UpdateServiceSoap::class);
+        $this->app->singleton('UpdateService', UpdateServiceSoap::class);
     }
 
 }

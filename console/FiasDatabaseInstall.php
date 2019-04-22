@@ -1,5 +1,5 @@
 <?php namespace Salxig\Fias\Console;
-
+use App;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,6 +16,15 @@ class FiasDatabaseInstall extends Command
      */
     protected $description = 'Install FIAS database.';
 
+    protected $updateService;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->setUpdateService();
+    }
+
     /**
      * Execute the console command.
      * @return void
@@ -27,6 +36,7 @@ class FiasDatabaseInstall extends Command
         $version_num = $this->option('version_num');
         //if(array_key_exists('region_nums'))
         $this->info(var_dump($region_nums));
+        $this->info(var_dump($this->updateService->getUrlForDeltaData(530)));
 
     }
 
@@ -49,8 +59,17 @@ class FiasDatabaseInstall extends Command
             ['version_num', 'vn', InputOption::VALUE_OPTIONAL, 'Version number DB FIAS.'],
             //['version_date', 'vd', InputOption::VALUE_OPTIONAL, 'Date of version DB FIAS.', 'last'],
             ['region_nums', 'rn',
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,//InputOption::VALUE_REQUIRED,
                 'Numbers of region DB FIAS.'],
         ];
     }
+
+    public function setUpdateService(): FiasDatabaseInstall
+    {
+        $this->updateService = App::make('UpdateService');
+
+        return $this;
+    }
+
+
 }
