@@ -1,6 +1,6 @@
 <?php
-
 namespace Salxig\Fias\Classes;
+
 use Config;
 use SoapClient;
 use Salxig\Fias\Contracts\UpdateService;
@@ -14,7 +14,7 @@ class UpdateServiceSoap implements UpdateService
     /**
      * @const
      */
-    
+
     //const DEFAULT_FIAS_WSDL = 'http://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL';
     protected $fias_wsdl;
 
