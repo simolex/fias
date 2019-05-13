@@ -3,7 +3,7 @@
 namespace Salxig\Fias\Provider;
 
 use October\Rain\Support\ServiceProvider;
-//use Salxig\Fias\Contracts\UpdateService;
+use Salxig\Fias\Contracts\UpdateService;
 use Salxig\Fias\Classes\UpdateServiceSoap;
 
 
