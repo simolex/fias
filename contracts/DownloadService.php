@@ -2,6 +2,7 @@
 
 namespace Salxig\Fias\Contracts;
 
+use Closure;
 /**
  * Интерфейс для объекта, который обращается к сервису обновления ФИАС.
  */
@@ -27,6 +28,6 @@ interface DownloadService
      *
      * @throws \RuntimeException
      */
-    public function downloadTo(string $urlToDownload, string $pathToLocalFile);
+    public function downloadTo(string $urlToDownload, Closure $FileStream);
 
 }
