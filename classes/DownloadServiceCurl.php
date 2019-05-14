@@ -67,9 +67,9 @@ class DownloadServiceCurl implements DownloadService
   }
 
   /**
-   * Add services by array
+   * Add a new files to the download service by array
    *
-   * @param array $services
+   * @param array $downloads
    *
    * @return $this
    *
