@@ -5,5 +5,5 @@ use Salxig\Fias\Contracts\DownloadService;
 
 class DownloadServiceCurl implements DownloadService
 {
-	
+
 }
