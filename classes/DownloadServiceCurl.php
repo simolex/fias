@@ -122,6 +122,7 @@ class DownloadServiceCurl implements DownloadService
 
   public function run()
   {
+  	
   	foreach($this->downloads as $OneDownload)
   	{
   		$requestOptions = [
@@ -131,7 +132,10 @@ class DownloadServiceCurl implements DownloadService
             CURLOPT_FOLLOWLOCATION 	=> true,
             CURLOPT_HTTPHEADER		=> true
         ];
-        if()
+
+        curl_setopt_array($this->curlHandler, $requestOptions);
+        curl_exec($this->curlHandler);
+
   	}
   }
 
