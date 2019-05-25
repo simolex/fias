@@ -41,6 +41,7 @@ class DownloadServiceCurl implements DownloadService
 	      return $contentLength;
 	    }
 
+
 	    //TODO: Exception to Error Code
 	    else return 0;
     }
@@ -140,4 +141,3 @@ class DownloadServiceCurl implements DownloadService
   }
 
 }
-
