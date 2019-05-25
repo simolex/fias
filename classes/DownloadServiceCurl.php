@@ -5,13 +5,18 @@ use Salxig\Fias\Contracts\DownloadService;
 
 class DownloadServiceCurl implements DownloadService
 {
-	protected $dowloades;
+	protected $downloads;
 	protected $curlHandler;
 
 	public function __construct($dl_thread = 1)
 	{
     	$this->downloads = [];
     	$this->curlHandler = curl_init();
+	}
+
+	private function has($value):bool
+	{
+		return array_key_exists($value, this->downloads);
 	}
 
 	protected function curlGetSize($url):int
@@ -52,7 +57,7 @@ class DownloadServiceCurl implements DownloadService
   public function add($url, $resource)
   {
     $url_hash = md5($url);
-    if (!$this->has($url_hash)) {
+    if ((!$this->has($url_hash)) && is_resource($resource)) {
       //$service = new Service();
 
       //$closure($service);
@@ -80,7 +85,9 @@ class DownloadServiceCurl implements DownloadService
   {
 	if (!empty($downloads)) {
       foreach ($downloads as $url_hash => $download) {
-        if (!$this->has($url_hash)) {
+      	$url_hash = md5($download['url']);
+        if ((!$this->has($url_hash)) && is_resource($download['resource']))
+		{
           //$service = new Service();
 
 	      /*foreach ($methods as $method => $value) {
@@ -94,7 +101,7 @@ class DownloadServiceCurl implements DownloadService
 	            ));
 	          }
 	      }*/
-	      $downloads['fileSize'] = $this->curlGetSize($url);
+	      $download['fileSize'] = $this->curlGetSize($url);
 
 
           $this->downloads[$url_hash] = $download;
@@ -110,6 +117,21 @@ class DownloadServiceCurl implements DownloadService
     }
 
     return $this;
+  }
+
+  public function run()
+  {
+  	foreach($this->downloads as $OneDownload)
+  	{
+  		$requestOptions = [
+            CURLOPT_URL 			=> $OneDownload['url'],
+            CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
+            CURLOPT_FILE 			=> $OneDownload['resource'],
+            CURLOPT_FOLLOWLOCATION 	=> true,
+            CURLOPT_HTTPHEADER		=> true
+        ];
+        if()
+  	}
   }
 
   public function __destruct()
