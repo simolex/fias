@@ -14,7 +14,7 @@ class DownloadServiceCurl implements DownloadService
     	$this->curlHandler = curl_init();
 	}
 
-	private function has($value):bool
+	protected function has($value):bool
 	{
 		return array_key_exists($value, this->downloads);
 	}
@@ -123,7 +123,7 @@ class DownloadServiceCurl implements DownloadService
   public function run()
   {
   	
-  	foreach($this->downloads as $OneDownload)
+  	foreach($this->downloads as $key => $OneDownload)
   	{
   		$requestOptions = [
             CURLOPT_URL 			=> $OneDownload['url'],
@@ -134,8 +134,23 @@ class DownloadServiceCurl implements DownloadService
         ];
 
         curl_setopt_array($this->curlHandler, $requestOptions);
-        curl_exec($this->curlHandler);
+        $resultCurl = curl_exec($this->curlHandler);
 
+        if($OneDownload['resource'])
+        	fclose($OneDownload['resource']);
+
+        $httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
+        
+        if ($resultCurl === false || $httpStatus !== 200) {
+            unset($this->downloads[$key]);
+        } else {
+            unset($this->downloads[$key]['url']);
+            unset($this->downloads[$key]['resource']);
+            $this->downloads[$key]['httpStatus'] = $httpStatus;
+            $this->downloads[$key]['httpError']= curl_error($this->curlHandler);
+        }
+
+        curl_reset($this->curlHandler);
   	}
   }
 

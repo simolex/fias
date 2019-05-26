@@ -9,25 +9,34 @@ use Closure;
 interface DownloadService
 {
     /**
-     * Скачивает файл по ссылке из первого параметра в локальный файл,
+     * Подготовливает сервис для скачивания файла 
+     * по ссылке из первого параметра в целевой поток,
      * указанный во втором параметре.
      *
      * @param string $urlToDownload
-     * @param string $pathToLocalFile
+     * @param $resource
      *
      * @throws \RuntimeException
      */
-    public function download(string $urlToDownload, string $pathToLocalFile);
+    public function add(string $urlToDownload,  $resource);
 
     /**
-     * Скачивает файл по ссылке из первого параметра в локальный файл,
-     * указанный во втором параметре.
+     * Добавить ссылки и целевой поток из массива
+     * 
      *
-     * @param string $urlToDownload
-     * @param string $pathToLocalFile
+     * @param array $downloads = ['url', 'resource']
+     * 
      *
      * @throws \RuntimeException
      */
-    public function downloadTo(string $urlToDownload, Closure $FileStream);
+    public function addByArray(array $downloads);
+
+    /**
+     * Запустить загрузку файлов
+     *
+     */
+    public function run();
+
+
 
 }
