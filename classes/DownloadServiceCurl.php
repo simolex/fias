@@ -16,7 +16,7 @@ class DownloadServiceCurl implements DownloadService
 
 	protected function has($value):bool
 	{
-		return array_key_exists($value, this->downloads);
+		return array_key_exists($value, $this->downloads);
 	}
 
 	protected function curlGetSize($url):int
@@ -122,7 +122,7 @@ class DownloadServiceCurl implements DownloadService
 
   public function run()
   {
-  	
+
   	foreach($this->downloads as $key => $OneDownload)
   	{
   		$requestOptions = [
@@ -140,7 +140,7 @@ class DownloadServiceCurl implements DownloadService
         	fclose($OneDownload['resource']);
 
         $httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
-        
+
         if ($resultCurl === false || $httpStatus !== 200) {
             unset($this->downloads[$key]);
         } else {

@@ -1,5 +1,6 @@
 <?php namespace Salxig\Fias\Console;
 use App;
+use Storage;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,12 +18,16 @@ class FiasDatabaseInstall extends Command
     protected $description = 'Install FIAS database.';
 
     protected $updateService;
+    protected $downloadService;
+    protected $storageFias;
 
     public function __construct()
     {
         parent::__construct();
 
         $this->setUpdateService();
+        $this->setDownloadService();
+        $this->setFiasStorage();
     }
 
     /**
@@ -35,8 +40,13 @@ class FiasDatabaseInstall extends Command
         $region_nums = $this->option('region_nums');
         $version_num = $this->option('version_num');
         //if(array_key_exists('region_nums'))
-        $this->info(var_dump($region_nums));
-        $this->info(var_dump($this->updateService->getUrlForDeltaData(530)));
+        $res = $this->setFiasStorage();
+        $this->storageFias->getDriver()->getAdapter()->setPathPrefix(
+            $this->storageFias->getDriver()->getAdapter()->applyPathPrefix('fias')
+        );
+        $this->info(var_dump(Storage::AllDirectories()));
+        //$this->info(var_dump($region_nums));
+        //$this->info(var_dump($this->updateService->getUrlForDeltaData(530)));
 
     }
 
@@ -64,11 +74,32 @@ class FiasDatabaseInstall extends Command
         ];
     }
 
-    public function setUpdateService(): FiasDatabaseInstall
+    protected function setUpdateService():bool
     {
         $this->updateService = App::make('UpdateService');
 
-        return $this;
+        return isset($this->updateService);
+    }
+
+    protected function setDownloadService():bool
+    {
+        $this->downloadService = App::make('DownloadService');
+
+        return isset($this->downloadService);
+    }
+
+    protected function setFiasStorage():bool
+    {
+        $this->storageFias = Storage::disk('local');
+        //$this->storageFias->
+
+        $directories = Storage::AllDirectories('fias');
+        if(empty($directories))
+        {
+            Storage::makeDirectory('fias/full');
+            Storage::makeDirectory('fias/delta');
+        }
+        return !empty(Storage::directories('fias'));
     }
 
 

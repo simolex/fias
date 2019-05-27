@@ -9,4 +9,6 @@ interface DirectoryService
      * @return bool
      */
 	public function create(): bool;
+
+	public function getFileVersion
 }
