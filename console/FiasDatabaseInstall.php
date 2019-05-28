@@ -1,9 +1,11 @@
 <?php namespace Salxig\Fias\Console;
 use App;
-use Storage;
+
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+
+use File;
 
 class FiasDatabaseInstall extends Command
 {
@@ -40,11 +42,8 @@ class FiasDatabaseInstall extends Command
         $region_nums = $this->option('region_nums');
         $version_num = $this->option('version_num');
         //if(array_key_exists('region_nums'))
-        $res = $this->setFiasStorage();
-        $this->storageFias->getDriver()->getAdapter()->setPathPrefix(
-            $this->storageFias->getDriver()->getAdapter()->applyPathPrefix('fias')
-        );
-        $this->info(var_dump(Storage::AllDirectories()));
+
+        $this->info(var_dump($this->storageFias->getStreamLocalFile('full',531,'xml')));
         //$this->info(var_dump($region_nums));
         //$this->info(var_dump($this->updateService->getUrlForDeltaData(530)));
 
@@ -90,16 +89,9 @@ class FiasDatabaseInstall extends Command
 
     protected function setFiasStorage():bool
     {
-        $this->storageFias = Storage::disk('local');
-        //$this->storageFias->
+        $this->storageFias = App::make('DirectoryService');
 
-        $directories = Storage::AllDirectories('fias');
-        if(empty($directories))
-        {
-            Storage::makeDirectory('fias/full');
-            Storage::makeDirectory('fias/delta');
-        }
-        return !empty(Storage::directories('fias'));
+        return isset($this->storageFias);
     }
 
 
