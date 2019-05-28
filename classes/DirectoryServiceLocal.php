@@ -4,6 +4,7 @@ namespace Salxig\Fias\Classes;
 use Salxig\Fias\Contracts\DirectoryService;
 use Storage;
 use File;
+use DirectoryIterator;
 
 use October\Rain\Exception\ApplicationException;
 
@@ -51,14 +52,73 @@ class DirectoryServiceLocal implements DirectoryService
         return $hLocal;
 	}
 
-	public function getMaxFullVersion($format = 'xml')
+	public function getMaxFullVersion(string $format = 'xml')
 	{
-		return;
+		if($versionAll = $this->getAllFullVersion($format)){
+			array_multisort($versionAll,SORT_ASC, SORT_NUMERIC);
+
+			return (int) array_pop($versionAll);
+		}
+		return false;
+
 	}
 
-	public function getMaxDeltaVersion($format = 'xml')
+	public function getMaxDeltaVersion(string $format = 'xml')
 	{
-		return;
+		if($versionAll = $this->getAllDeltaVersion($format)){
+			array_multisort($versionAll,SORT_ASC, SORT_NUMERIC);
+
+			return (int) array_pop($versionAll);
+		}
+		return false;
+	}
+
+	public function getAllFullVersion(string $format = 'xml')
+	{
+		$pathFullStorage =  $this->makePath('full');
+
+		if(File::isDirectory($pathFullStorage) && File::exists($pathFullStorage)){
+			$dirs = new DirectoryIterator($pathFullStorage);
+			$test = [];
+	        foreach ($dirs as $node) {
+	            if (substr($node->getFileName(), 0, 1) == '.') {
+	                continue;
+	            }
+
+	            $pathVersion = $node->getPathname();
+
+	            if (substr($pathVersion, 0, strlen($pathFullStorage)) == $pathFullStorage) {
+		            $numVersion = ltrim(substr($pathVersion, strlen($pathFullStorage)), $this->pathSeparator);
+		        }
+	            $test[]= (int)$numVersion;
+	        }
+	        return $test;
+	    }
+	    return false;
+	}
+
+	public function getAllDeltaVersion(string $format = 'xml')
+	{
+		$pathFullStorage =  $this->makePath('delta');
+
+		if(File::isDirectory($pathFullStorage) && File::exists($pathFullStorage)){
+			$dirs = new DirectoryIterator($pathFullStorage);
+			$test = [];
+	        foreach ($dirs as $node) {
+	            if (substr($node->getFileName(), 0, 1) == '.') {
+	                continue;
+	            }
+
+	            $pathVersion = $node->getPathname();
+
+	            if (substr($pathVersion, 0, strlen($pathFullStorage)) == $pathFullStorage) {
+		            $numVersion = ltrim(substr($pathVersion, strlen($pathFullStorage)), $this->pathSeparator);
+		        }
+	            $test[]= (int)$numVersion;
+	        }
+	        return $test;
+	    }
+	    return false;
 	}
 
 
@@ -85,6 +145,11 @@ class DirectoryServiceLocal implements DirectoryService
 		}
 
 		return $localPath;
+	}
+
+	protected function makeUploadsPath()
+	{
+		return ($this->workFolder. $this->pathSeparator. 'uploads');
 	}
 
 	private function makeDirectory(string $pathDirectory)

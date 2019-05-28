@@ -10,8 +10,10 @@ interface DirectoryService
      */
 	//public function create(): bool;
 	public function isExists(string $type, int $version, string $format):bool;
-	public function getMaxFullVersion(string $format);
-	public function getMaxDeltaVersion(string $format);
+	public function getAllFullVersion();
+	public function getAllDeltaVersion();
+	public function getMaxFullVersion();
+	public function getMaxDeltaVersion();
 	public function getStreamLocalFile(string $type, int $version, string $format);
 
 }

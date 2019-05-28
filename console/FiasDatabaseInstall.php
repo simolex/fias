@@ -43,7 +43,7 @@ class FiasDatabaseInstall extends Command
         $version_num = $this->option('version_num');
         //if(array_key_exists('region_nums'))
 
-        $this->info(var_dump($this->storageFias->getStreamLocalFile('full',531,'xml')));
+        $this->info(var_dump($this->storageFias->getMaxDeltaVersion()));
         //$this->info(var_dump($region_nums));
         //$this->info(var_dump($this->updateService->getUrlForDeltaData(530)));
 
