@@ -12,6 +12,7 @@ class DirectoryServiceLocal implements DirectoryService
 {
 	protected $pathSeparator;
 	protected $workFolder;
+	protected $listFilesStream;
 	//protected $storageFias;
 
 	public function __construct()
@@ -19,6 +20,7 @@ class DirectoryServiceLocal implements DirectoryService
 		//$this->storageFias		= Storage::disk('local');
 		$this->pathSeparator 	= '/';
 		$this->workFolder 		= Storage::disk('local')->getDriver()->getAdapter()->applyPathPrefix('fias');
+		$this->listFilesStream = [];
 
         /*if(File::isDirectoryEmpty($this->workFolder))
         {
@@ -35,9 +37,11 @@ class DirectoryServiceLocal implements DirectoryService
 
 	}
 
-	public function getStreamLocalFile(string $type, int $version, string $format = 'xml')
+	public function openStreamLocalFile(string $type, int $version, string $format = 'xml')
 	{
-		$pathToLocalFile = $this->makePath($type, $version, $format);
+		$keyStream = implode('_', compact('type', 'version', 'format'));
+
+		$pathToLocalFile = $this->makePath('uploads'). $this->pathSeparator. $keyStream. '.~ar';
 
 		$resMakeDirectory = $this->makeDirectory(File::dirname($pathToLocalFile));
 		//if exeption
@@ -49,7 +53,26 @@ class DirectoryServiceLocal implements DirectoryService
                 "Can't open local file for writing: {$pathToLocalFile}"
             );
         }
+
+
+        $this->listFilesStream[$keyStream] = $hLocal;
         return $hLocal;
+	}
+
+	public function closeStreamLocalFile(string $type, int $version, string $format = 'xml')
+	{
+		$keyStream = implode('_', compact('type', 'version', 'format'));
+
+		$pathToSourceFile = $this->makePath('uploads'). $this->pathSeparator. $keyStream. '.~ar';
+
+		if(is_resource($this->listFilesStream[$keyStream]))
+			fclose($this->listFilesStream[$keyStream]);
+
+		$pathToDestFile = $this->makePath($type, $version, $format);
+		$resMakeDirectory = $this->makeDirectory(File::dirname($pathToDestFile));
+
+		return File::move($pathToSourceFile, $pathToDestFile, true);
+
 	}
 
 	public function getMaxFullVersion(string $format = 'xml')
@@ -127,6 +150,7 @@ class DirectoryServiceLocal implements DirectoryService
 		switch ($type) {
 			case 'full':
 			case 'delta':
+			case 'uploads':
 				$localPath = $this->workFolder.	$this->pathSeparator. (string) $type;
 				break;
 			default:
@@ -145,11 +169,6 @@ class DirectoryServiceLocal implements DirectoryService
 		}
 
 		return $localPath;
-	}
-
-	protected function makeUploadsPath()
-	{
-		return ($this->workFolder. $this->pathSeparator. 'uploads');
 	}
 
 	private function makeDirectory(string $pathDirectory)
