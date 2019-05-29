@@ -7,11 +7,13 @@ class DownloadServiceCurl implements DownloadService
 {
 	protected $downloads;
 	protected $curlHandler;
+	protected $sizeTotal;
 
 	public function __construct($dl_thread = 1)
 	{
     	$this->downloads = [];
     	$this->curlHandler = curl_init();
+    	$this->sizeTotal = 0;
 	}
 
 	protected function has($value):bool
@@ -25,7 +27,7 @@ class DownloadServiceCurl implements DownloadService
             CURLOPT_URL 			=> $url,
             CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
             CURLOPT_FOLLOWLOCATION 	=> true,
-            CURLOPT_HTTPHEADER		=> true,
+            //CURLOPT_HTTPHEADER		=> true,
             CURLOPT_NOBODY			=> true
         ];
 
@@ -46,6 +48,19 @@ class DownloadServiceCurl implements DownloadService
 	    else return 0;
     }
 
+    public static function callbackProgress($resource, $dl_fullSize, $dl_curSize, $ul_fullSize = 0, $ul_curSize = 0, $resource_id)
+    {
+    	if($dl_fullSize > 0)
+         echo $dl_curSize / $dl_fullSize  * 100;
+    }
+
+    public function getTest($url)
+    {
+    	$url_hash = md5($url);
+    	return $this->downloads[$url_hash];
+
+    }
+
 	/**
    * Add a new file to the download service
    *
@@ -55,22 +70,23 @@ class DownloadServiceCurl implements DownloadService
    * @return $this
    * @throws ServiceAlreadyExists
    */
-  public function add($url, $resource)
-  {
-    $url_hash = md5($url);
-    if ((!$this->has($url_hash)) && is_resource($resource)) {
-      //$service = new Service();
+	public function add($url, $resource)
+	{
+		$url_hash = md5($url);
+		if ((!$this->has($url_hash)) && is_resource($resource)) {
+		  	//$service = new Service();
 
-      //$closure($service);
-      $fileSize = $this->curlGetSize($url);
+		  	//$closure($service);
+			$fileSize = $this->curlGetSize($url);
+			$this->sizeTotal += (int)$fileSize;
 
-      $this->downloads[$url_hash] = compact('url','resource','fileSize');
+			$this->downloads[$url_hash] = compact('url','resource','fileSize');
 
-      return $this;
-    }
+		  return $this;
+		}
 
-    //throw new ServiceAlreadyExists("Service '" . $name . "' already exists.");
-  }
+	//throw new ServiceAlreadyExists("Service '" . $name . "' already exists.");
+	}
 
   /**
    * Add a new files to the download service by array
@@ -103,7 +119,7 @@ class DownloadServiceCurl implements DownloadService
 	          }
 	      }*/
 	      $download['fileSize'] = $this->curlGetSize($url);
-
+	      $this->sizeTotal += (int)$download['fileSize'];
 
           $this->downloads[$url_hash] = $download;
 
@@ -120,24 +136,29 @@ class DownloadServiceCurl implements DownloadService
     return $this;
   }
 
-  public function run()
+  public function run($progress = null)
   {
+  	if(is_callable($progress) && $progress!=null)
 
   	foreach($this->downloads as $key => $OneDownload)
   	{
+
+
   		$requestOptions = [
             CURLOPT_URL 			=> $OneDownload['url'],
             CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
             CURLOPT_FILE 			=> $OneDownload['resource'],
             CURLOPT_FOLLOWLOCATION 	=> true,
-            CURLOPT_HTTPHEADER		=> true
+            CURLOPT_PROGRESSFUNCTION=> function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($key) {
+    			$this->callbackProgress($resource, $downloadSize, $downloaded, $uploadSize, $uploaded, $key);
+    		}
         ];
 
         curl_setopt_array($this->curlHandler, $requestOptions);
         $resultCurl = curl_exec($this->curlHandler);
 
-        if($OneDownload['resource'])
-        	fclose($OneDownload['resource']);
+        /*if($OneDownload['resource'])
+        	fclose($OneDownload['resource']);*/
 
         $httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
 
@@ -152,6 +173,7 @@ class DownloadServiceCurl implements DownloadService
 
         curl_reset($this->curlHandler);
   	}
+  	$this->sizeTotal = 0;
   }
 
   public function __destruct()

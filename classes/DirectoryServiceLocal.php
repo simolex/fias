@@ -181,4 +181,31 @@ class DirectoryServiceLocal implements DirectoryService
 
 		return File::makeDirectory($pathDirectory);
 	}
+
+/*	private function checkParams(string $type, int $version = 0, string $format = '')
+	{
+		$resultCheck = true;
+
+		switch ($type) {
+			case 'full':
+			case 'delta':
+			case 'uploads':
+				break;
+			default:
+				return false;
+				break;
+		}
+		if($version < 0) return false;
+
+		switch ($format) {
+			case 'xml':
+			case 'dbf':
+			case '':
+				break;
+			default:
+				return false;
+				break;
+		}
+		return true;
+	}*/
 }

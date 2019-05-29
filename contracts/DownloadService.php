@@ -9,7 +9,7 @@ use Closure;
 interface DownloadService
 {
     /**
-     * Подготовливает сервис для скачивания файла 
+     * Подготовливает сервис для скачивания файла
      * по ссылке из первого параметра в целевой поток,
      * указанный во втором параметре.
      *
@@ -22,10 +22,10 @@ interface DownloadService
 
     /**
      * Добавить ссылки и целевой поток из массива
-     * 
+     *
      *
      * @param array $downloads = ['url', 'resource']
-     * 
+     *
      *
      * @throws \RuntimeException
      */
@@ -36,6 +36,8 @@ interface DownloadService
      *
      */
     public function run();
+
+    public function getTest($url);
 
 
 

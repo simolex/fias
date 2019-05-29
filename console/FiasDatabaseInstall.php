@@ -4,6 +4,9 @@ use App;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+//use Symfony\Component\Console\Helper\ProgressBar;
+//
+//use Symfony\Component\Console\Style\SymfonyStyle;
 
 use File;
 
@@ -22,6 +25,7 @@ class FiasDatabaseInstall extends Command
     protected $updateService;
     protected $downloadService;
     protected $storageFias;
+    protected $globalProgress;
 
     public function __construct()
     {
@@ -30,20 +34,47 @@ class FiasDatabaseInstall extends Command
         $this->setUpdateService();
         $this->setDownloadService();
         $this->setFiasStorage();
+
+
     }
 
     /**
      * Execute the console command.
      * @return void
      */
+
+
     public function handle()
     {
+        //$section1 = $this->output->section('globalProgress');
 
         $region_nums = $this->option('region_nums');
         $version_num = $this->option('version_num');
         //if(array_key_exists('region_nums'))
+        if(!($this->storageFias->getMaxDeltaVersion())){
+            $this->globalProgress = $this->output->createProgressBar();
 
-        $this->info(var_dump($this->storageFias->getMaxDeltaVersion()));
+            $this->globalProgress->setMessage('Get list update files ...');
+            $resultUpdate = $this->updateService->getUrlForDeltaData(543);
+
+            $this->globalProgress->advance();
+            $this->globalProgress->setMessage('Get stream file ...');
+
+            $resultUpdate = $resultUpdate[0];
+            $handleFile = $this->storageFias->openStreamLocalFile('delta',$resultUpdate['version']);
+            $this->globalProgress->advance();
+            $dlService = $this->downloadService->add($resultUpdate['url'], $handleFile,);
+            $this->globalProgress->advance();
+            $size = $dlService->getTest($resultUpdate['url']);
+            $dlService->run();
+            $this->globalProgress->advance();
+            $this->storageFias->closeStreamLocalFile('delta',$resultUpdate['version']);
+
+            $this->globalProgress->finish();
+        }
+
+        //$this->info(var_dump($this->storageFias->getMaxFullVersion()));
+        $this->info(var_dump($size));
         //$this->info(var_dump($region_nums));
         //$this->info(var_dump($this->updateService->getUrlForDeltaData(530)));
 
