@@ -7,7 +7,7 @@ class DownloadServiceCurl implements DownloadService
 {
 	protected $downloads;
 	protected $curlHandler;
-	protected $sizeTotal;
+	public $sizeTotal;
 
 	public function __construct($dl_thread = 1)
 	{
@@ -138,7 +138,11 @@ class DownloadServiceCurl implements DownloadService
 
   public function run($progress = null)
   {
-  	if(is_callable($progress) && $progress!=null)
+    if($progress && is_callable($progress)){
+        $progress(0, 0, $this->sizeTotal);
+    }
+
+    $sizePrevDownloads=0;
 
   	foreach($this->downloads as $key => $OneDownload)
   	{
@@ -149,13 +153,19 @@ class DownloadServiceCurl implements DownloadService
             CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
             CURLOPT_FILE 			=> $OneDownload['resource'],
             CURLOPT_FOLLOWLOCATION 	=> true,
-            CURLOPT_PROGRESSFUNCTION=> function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($key) {
-    			$this->callbackProgress($resource, $downloadSize, $downloaded, $uploadSize, $uploaded, $key);
+            CURLOPT_NOPROGRESS      => false,
+            CURLOPT_PROGRESSFUNCTION=> function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($progress, $sizePrevDownloads) {
+
+    			if($progress && is_callable($progress)){
+                    $progress($downloaded, $sizePrevDownloads);
+                }
+                // $this->callbackProgress($resource, $downloadSize, $downloaded, $uploadSize, $uploaded, $key);
     		}
         ];
 
         curl_setopt_array($this->curlHandler, $requestOptions);
         $resultCurl = curl_exec($this->curlHandler);
+        $sizePrevDownloads += (int)$OneDownload['fileSize'];
 
         /*if($OneDownload['resource'])
         	fclose($OneDownload['resource']);*/
