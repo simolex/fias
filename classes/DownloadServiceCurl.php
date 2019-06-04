@@ -7,6 +7,12 @@ class DownloadServiceCurl implements DownloadService
 {
 	protected $downloads;
 	protected $curlHandler;
+
+	protected $maxTriesReconnection;
+	protected $minReconnectonProgress;
+	protected $waitReconnection;
+
+
 	public $sizeTotal;
 
 	public function __construct($dl_thread = 1)
@@ -14,11 +20,20 @@ class DownloadServiceCurl implements DownloadService
     	$this->downloads = [];
     	$this->curlHandler = curl_init();
     	$this->sizeTotal = 0;
+
+    	$this->maxTriesReconnection = 5;
+    	$this->minReconnectonProgress = 512*1024;
+    	$this->waitReconnection = 30;
 	}
 
 	protected function has($value):bool
 	{
 		return array_key_exists($value, $this->downloads);
+	}
+
+	protected function canNextReconnection(int tries, int progressPrev):bool
+	{
+		if()
 	}
 
 	protected function curlGetSize($url):int
@@ -138,6 +153,8 @@ class DownloadServiceCurl implements DownloadService
 
   public function run($progress = null)
   {
+    curl_reset($this->curlHandler);
+
     if($progress && is_callable($progress)){
         $progress(0, 0, $this->sizeTotal);
     }
@@ -146,44 +163,73 @@ class DownloadServiceCurl implements DownloadService
 
   	foreach($this->downloads as $key => $OneDownload)
   	{
-
+  		$curDownloadedSize = 0;
 
   		$requestOptions = [
             CURLOPT_URL 			=> $OneDownload['url'],
             CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
             CURLOPT_FILE 			=> $OneDownload['resource'],
-            CURLOPT_FOLLOWLOCATION 	=> true,
+            CURLOPT_BUFFERSIZE		=> (128*1024),
+            //CURLOPT_VERBOSE			=> true,
+            //CURLOPT_STDERR			=> fopen('/home/vagrant/code/octobercms/public/curl.log','a'),
+            //CURLOPT_FOLLOWLOCATION 	=> true,
             CURLOPT_NOPROGRESS      => false,
-            CURLOPT_PROGRESSFUNCTION=> function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($progress, $sizePrevDownloads) {
+            CURLOPT_LOW_SPEED_LIMIT => 1000,
+            CURLOPT_LOW_SPEED_TIME	=> 30,
+            CURLOPT_PROGRESSFUNCTION=> function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($progress, $sizePrevDownloads, $curDownloadedSize) {
 
     			if($progress && is_callable($progress)){
-                    $progress($downloaded, $sizePrevDownloads);
+                    $progress($downloaded + $curDownloadedSize, $sizePrevDownloads);
                 }
-                // $this->callbackProgress($resource, $downloadSize, $downloaded, $uploadSize, $uploaded, $key);
     		}
         ];
 
         curl_setopt_array($this->curlHandler, $requestOptions);
-        $resultCurl = curl_exec($this->curlHandler);
+
+       /* $resultCurl = curl_exec($this->curlHandler);
+
+        $curDownloadedSize += curl_getinfo($this->curlHandler, CURLINFO_SIZE_DOWNLOAD);
+        $httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);*/
+        do {
+
+        	if($curDownloadedSize > 0) curl_setopt($this->curlHandler, CURLOPT_RESUME_FROM, (float) $curDownloadedSize);
+
+        	if(!$resultCurl = curl_exec($this->curlHandler)) break;
+
+
+        	$curDownloadedSize += curl_getinfo($this->curlHandler, CURLINFO_SIZE_DOWNLOAD);
+        	$httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
+
+        } while (in_array(curl_errno($this->curlHandler), [CURLE_OPERATION_TIMEDOUT, CURLE_COULDNT_CONNECT]) &&
+        		in_array($httpStatus, [200,206])  &&
+        		$curDownloadedSize < $OneDownload['fileSize']);
+
+
         $sizePrevDownloads += (int)$OneDownload['fileSize'];
 
         /*if($OneDownload['resource'])
         	fclose($OneDownload['resource']);*/
 
-        $httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
+        //$httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
+        //$test  = curl_getinfo($this->curlHandler);
 
-        if ($resultCurl === false || $httpStatus !== 200) {
-            unset($this->downloads[$key]);
-        } else {
-            unset($this->downloads[$key]['url']);
-            unset($this->downloads[$key]['resource']);
-            $this->downloads[$key]['httpStatus'] = $httpStatus;
+        // if ($resultCurl === false || $httpStatus !== 200) {
+        //     unset($this->downloads[$key]);
+
+        // } else {
+        //     unset($this->downloads[$key]['url']);
+        //     unset($this->downloads[$key]['resource']);
+        //     $this->downloads[$key]['httpStatus'] = $httpStatus;
+        //     $this->downloads[$key]['httpError']= curl_error($this->curlHandler);
+        // }
+
+        //curl_reset($this->curlHandler);
+
+        $this->downloads[$key]['httpStatus'] = $httpStatus;
             $this->downloads[$key]['httpError']= curl_error($this->curlHandler);
-        }
-
-        curl_reset($this->curlHandler);
   	}
   	$this->sizeTotal = 0;
+  	return [$this->downloads, 'range'=>(string)$curlDownloadedSize.'-'.(string)$OneDownload['fileSize'], 'resultCurl' => $resultCurl, 'errno'=>curl_errno($this->curlHandler), 'cur_dl'=>$test];
   }
 
   public function __destruct()

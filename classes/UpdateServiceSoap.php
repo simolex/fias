@@ -35,6 +35,17 @@ class UpdateServiceSoap implements UpdateService
         if ($soapClient === null) {
             $soapClient = new SoapClient($fias_wsdl, [
                 'exceptions' => true,
+                'soap_version' => SOAP_1_2,
+                'cache_wsdl' => 0,
+                'stream_context' => stream_context_create(array(
+                    'http' => array(
+                        'user_agent' => 'PHPSoapClient'),
+                      'ssl' => array(
+                           'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                      )
+                  ))
             ]);
         }
 
