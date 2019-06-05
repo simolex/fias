@@ -2,6 +2,7 @@
 namespace Salxig\Fias\Classes;
 
 use Salxig\Fias\Contracts\DownloadService;
+use Log;
 
 class DownloadServiceCurl implements DownloadService
 {
@@ -9,6 +10,7 @@ class DownloadServiceCurl implements DownloadService
 	protected $curlHandler;
 
 	protected $maxTriesReconnection;
+	protected $countTries;
 	protected $minReconnectonProgress;
 	protected $waitReconnection;
 
@@ -22,8 +24,8 @@ class DownloadServiceCurl implements DownloadService
     	$this->sizeTotal = 0;
 
     	$this->maxTriesReconnection = 5;
-    	$this->minReconnectonProgress = 512*1024;
-    	$this->waitReconnection = 30;
+    	$this->minProgressReconnecton = 512*1024;
+    	$this->waitReconnection = 180;
 	}
 
 	protected function has($value):bool
@@ -31,13 +33,30 @@ class DownloadServiceCurl implements DownloadService
 		return array_key_exists($value, $this->downloads);
 	}
 
-	protected function canNextReconnection(int tries, int progressPrev):bool
+	private function initTries()
 	{
-		if()
+		$this->countTries = 0;
+	}
+
+	protected function canNextReconnection(int $progressPrev):bool
+	{
+		if($progressPrev = 0){
+			sleep($this->waitReconnection);
+			Log::info('Sleep'.$this->waitReconnection);
+		}
+		if($progressPrev<$this->minProgressReconnecton)
+			$this->countTries +=1;
+		else
+			$this->countTries = 0;
+
+		return (($this->countTries <= $this->maxTriesReconnection)?true:false);
+
 	}
 
 	protected function curlGetSize($url):int
 	{
+		curl_reset($this->curlHandler);
+
 		$requestOptions = [
             CURLOPT_URL 			=> $url,
             CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
@@ -52,7 +71,7 @@ class DownloadServiceCurl implements DownloadService
         $contentLength = curl_getinfo($this->curlHandler, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
         $httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
 
-        curl_reset($this->curlHandler);
+
 
         if( $httpStatus == 200 || ($httpStatus > 300 && $httpStatus <= 308) ) {
 	      return $contentLength;
@@ -153,7 +172,7 @@ class DownloadServiceCurl implements DownloadService
 
   public function run($progress = null)
   {
-    curl_reset($this->curlHandler);
+
 
     if($progress && is_callable($progress)){
         $progress(0, 0, $this->sizeTotal);
@@ -165,18 +184,22 @@ class DownloadServiceCurl implements DownloadService
   	{
   		$curDownloadedSize = 0;
 
+  		$this->initTries();
+  		curl_reset($this->curlHandler);
+
   		$requestOptions = [
             CURLOPT_URL 			=> $OneDownload['url'],
             CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
             CURLOPT_FILE 			=> $OneDownload['resource'],
             CURLOPT_BUFFERSIZE		=> (128*1024),
-            //CURLOPT_VERBOSE			=> true,
-            //CURLOPT_STDERR			=> fopen('/home/vagrant/code/octobercms/public/curl.log','a'),
-            //CURLOPT_FOLLOWLOCATION 	=> true,
+            // CURLOPT_VERBOSE			=> true,
+            // CURLOPT_STDERR			=> fopen('/home/vagrant/code/octobercms/public/curl.log','a'),
+            CURLOPT_FOLLOWLOCATION 	=> true,
             CURLOPT_NOPROGRESS      => false,
+            // CURLOPT_TIMEOUT => 10,
             CURLOPT_LOW_SPEED_LIMIT => 1000,
             CURLOPT_LOW_SPEED_TIME	=> 30,
-            CURLOPT_PROGRESSFUNCTION=> function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($progress, $sizePrevDownloads, $curDownloadedSize) {
+            CURLOPT_PROGRESSFUNCTION=> function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) use ($progress, $sizePrevDownloads, &$curDownloadedSize) {
 
     			if($progress && is_callable($progress)){
                     $progress($downloaded + $curDownloadedSize, $sizePrevDownloads);
@@ -192,20 +215,23 @@ class DownloadServiceCurl implements DownloadService
         $httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);*/
         do {
 
-        	if($curDownloadedSize > 0) curl_setopt($this->curlHandler, CURLOPT_RESUME_FROM, (float) $curDownloadedSize);
+        	if($curDownloadedSize > 0)
+        		curl_setopt($this->curlHandler, CURLOPT_RESUME_FROM, (float) $curDownloadedSize);
 
-        	if(!$resultCurl = curl_exec($this->curlHandler)) break;
+        	$resultCurl = curl_exec($this->curlHandler);
 
+        	$dlProgress = curl_getinfo($this->curlHandler, CURLINFO_SIZE_DOWNLOAD);
+        	$curDownloadedSize += $dlProgress;
 
-        	$curDownloadedSize += curl_getinfo($this->curlHandler, CURLINFO_SIZE_DOWNLOAD);
         	$httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
 
         } while (in_array(curl_errno($this->curlHandler), [CURLE_OPERATION_TIMEDOUT, CURLE_COULDNT_CONNECT]) &&
         		in_array($httpStatus, [200,206])  &&
-        		$curDownloadedSize < $OneDownload['fileSize']);
+        		$curDownloadedSize < $OneDownload['fileSize'] &&
+        		$this->canNextReconnection($dlProgress));
 
 
-        $sizePrevDownloads += (int)$OneDownload['fileSize'];
+
 
         /*if($OneDownload['resource'])
         	fclose($OneDownload['resource']);*/
@@ -213,23 +239,23 @@ class DownloadServiceCurl implements DownloadService
         //$httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
         //$test  = curl_getinfo($this->curlHandler);
 
-        // if ($resultCurl === false || $httpStatus !== 200) {
-        //     unset($this->downloads[$key]);
+        if ($resultCurl && in_array($httpStatus, [200,206])) {
 
-        // } else {
-        //     unset($this->downloads[$key]['url']);
-        //     unset($this->downloads[$key]['resource']);
-        //     $this->downloads[$key]['httpStatus'] = $httpStatus;
-        //     $this->downloads[$key]['httpError']= curl_error($this->curlHandler);
-        // }
+            $sizePrevDownloads += (int)$OneDownload['fileSize'];
+            unset($this->downloads[$key]);
 
-        //curl_reset($this->curlHandler);
-
-        $this->downloads[$key]['httpStatus'] = $httpStatus;
-            $this->downloads[$key]['httpError']= curl_error($this->curlHandler);
+        } else {
+            unset($this->downloads[$key]['url']);
+            unset($this->downloads[$key]['resource']);
+            $this->downloads[$key]['httpStatus'] = $httpStatus;
+            $this->downloads[$key]['httpError'] = curl_error($this->curlHandler);
+            $this->downloads[$key]['httpErrorNum'] = curl_errno($this->curlHandler);
+        }
   	}
+
   	$this->sizeTotal = 0;
-  	return [$this->downloads, 'range'=>(string)$curlDownloadedSize.'-'.(string)$OneDownload['fileSize'], 'resultCurl' => $resultCurl, 'errno'=>curl_errno($this->curlHandler), 'cur_dl'=>$test];
+
+  	return $this->downloads;
   }
 
   public function __destruct()

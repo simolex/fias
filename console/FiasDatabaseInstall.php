@@ -51,18 +51,18 @@ class FiasDatabaseInstall extends Command
         $region_nums = $this->option('region_nums');
         $version_num = $this->option('version_num');
         //if(array_key_exists('region_nums'))
-        if(!($this->storageFias->getMaxDeltaVersion())){
+        if(!($this->storageFias->getMaxFullVersion())){
             $this->globalProgress = $this->output->createProgressBar(5);
 
             $this->globalProgress->setMessage('Get list update files ...');
-            $resultUpdate = $this->updateService->getUrlForDeltaData(543);
-            //$resultUpdate = $this->updateService->getUrlForCompleteData();
+            //$resultUpdate = $this->updateService->getUrlForDeltaData(543);
+            $resultUpdate = $this->updateService->getUrlForCompleteData();
 
             $this->globalProgress->advance();
             $this->globalProgress->setMessage('Get stream file ...');
 
-            $resultUpdate = $resultUpdate[0];
-            $handleFile = $this->storageFias->openStreamLocalFile('delta',$resultUpdate['version']);
+            //$resultUpdate = $resultUpdate[0];
+            $handleFile = $this->storageFias->openStreamLocalFile('full',$resultUpdate['version']);
             $this->globalProgress->advance();
             $dlService = $this->downloadService->add($resultUpdate['url'], $handleFile);
             $this->globalProgress->advance();
@@ -80,7 +80,7 @@ class FiasDatabaseInstall extends Command
 
                 });
             $this->globalProgress->advance();
-            $this->storageFias->closeStreamLocalFile('delta',$resultUpdate['version']);
+            $this->storageFias->closeStreamLocalFile('full',$resultUpdate['version']);
 
             $this->globalProgress->finish();
         }
