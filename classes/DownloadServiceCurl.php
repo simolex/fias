@@ -42,8 +42,9 @@ class DownloadServiceCurl implements DownloadService
 	{
 		if($progressPrev = 0){
 			sleep($this->waitReconnection);
-			Log::info('Sleep'.$this->waitReconnection);
-		}
+		} else sleep(5);
+
+
 		if($progressPrev<$this->minProgressReconnecton)
 			$this->countTries +=1;
 		else
@@ -192,6 +193,7 @@ class DownloadServiceCurl implements DownloadService
             CURLOPT_HTTPHEADER		=> ['Connection: Keep-Alive', 'Keep-Alive: 300'],
             CURLOPT_FILE 			=> $OneDownload['resource'],
             CURLOPT_BUFFERSIZE		=> (128*1024),
+            CURLOPT_USERAGENT 		=> 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
             // CURLOPT_VERBOSE			=> true,
             // CURLOPT_STDERR			=> fopen('/home/vagrant/code/octobercms/public/curl.log','a'),
             CURLOPT_FOLLOWLOCATION 	=> true,
@@ -225,6 +227,14 @@ class DownloadServiceCurl implements DownloadService
 
         	$httpStatus = curl_getinfo($this->curlHandler, CURLINFO_HTTP_CODE);
 
+        	$iterationResult = [
+        		'httpStatus' 	=> $httpStatus,
+        		'httpErrorTxt'	=> curl_error($this->curlHandler),
+        		'httpErrorNum'	=> curl_errno($this->curlHandler),
+        		'httpProgress'	=> $dlProgress,
+        	];
+        	$this->downloads[$key]['Result'][] = $iterationResult;
+
         } while (in_array(curl_errno($this->curlHandler), [CURLE_OPERATION_TIMEDOUT, CURLE_COULDNT_CONNECT]) &&
         		in_array($httpStatus, [200,206])  &&
         		$curDownloadedSize < $OneDownload['fileSize'] &&
@@ -243,13 +253,14 @@ class DownloadServiceCurl implements DownloadService
 
             $sizePrevDownloads += (int)$OneDownload['fileSize'];
             unset($this->downloads[$key]);
+            $this->downloads[$key]['Result'] = true;
 
         } else {
             unset($this->downloads[$key]['url']);
             unset($this->downloads[$key]['resource']);
-            $this->downloads[$key]['httpStatus'] = $httpStatus;
+            /*$this->downloads[$key]['httpStatus'] = $httpStatus;
             $this->downloads[$key]['httpError'] = curl_error($this->curlHandler);
-            $this->downloads[$key]['httpErrorNum'] = curl_errno($this->curlHandler);
+            $this->downloads[$key]['httpErrorNum'] = curl_errno($this->curlHandler);*/
         }
   	}
 
