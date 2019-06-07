@@ -67,7 +67,7 @@ class FiasDatabaseInstall extends Command
             $dlService = $this->downloadService->add($resultUpdate['url'], $handleFile);
             $this->globalProgress->advance();
             $size = $dlService->getTest($resultUpdate['url']);
-            $res = $dlService->run(function ($progress_value, $prev_progress, $max_value = null)
+            $resDownloads = $dlService->run(function ($progress_value, $prev_progress, $max_value = null)
                 {
                     if($max_value !== null){
                         //$this->info('max_value:'.$max_value);
@@ -80,7 +80,10 @@ class FiasDatabaseInstall extends Command
 
                 });
             $this->globalProgress->advance();
-            $this->storageFias->closeStreamLocalFile('full',$resultUpdate['version']);
+
+            if($resDownloads === true){
+                $this->storageFias->closeStreamLocalFile('full',$resultUpdate['version']);
+            }
 
             $this->globalProgress->finish();
         }

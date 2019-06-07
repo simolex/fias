@@ -253,7 +253,7 @@ class DownloadServiceCurl implements DownloadService
 
             $sizePrevDownloads += (int)$OneDownload['fileSize'];
             unset($this->downloads[$key]);
-            $this->downloads[$key]['Result'] = true;
+            //$this->downloads[$key]['Result'] = true;
 
         } else {
             unset($this->downloads[$key]['url']);
@@ -266,7 +266,7 @@ class DownloadServiceCurl implements DownloadService
 
   	$this->sizeTotal = 0;
 
-  	return $this->downloads;
+  	return (count($this->downloads) == 0)? true: $this->downloads;
   }
 
   public function __destruct()

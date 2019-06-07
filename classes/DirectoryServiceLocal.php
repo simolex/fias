@@ -72,7 +72,6 @@ class DirectoryServiceLocal implements DirectoryService
 		$resMakeDirectory = $this->makeDirectory(File::dirname($pathToDestFile));
 
 		return File::move($pathToSourceFile, $pathToDestFile, true);
-
 	}
 
 	public function getMaxFullVersion(string $format = 'xml')
