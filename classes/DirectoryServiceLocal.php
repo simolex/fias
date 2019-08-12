@@ -5,6 +5,8 @@ use Salxig\Fias\Contracts\DirectoryService;
 use Storage;
 use File;
 use DirectoryIterator;
+use RarArchive;
+use RarEntry;
 
 use October\Rain\Exception\ApplicationException;
 
@@ -141,6 +143,24 @@ class DirectoryServiceLocal implements DirectoryService
 	        return $test;
 	    }
 	    return false;
+	}
+
+	public function findFullPathByPattern(string $pattern, string $type, int $version, string $format = 'xml' ): array
+	{
+		$return = [];
+		$pathPackageFias =  $this->makePath($type, $version, $format);
+		$regexp = '/^' . implode('[^\/\.]+', array_map('preg_quote', explode('*', $pattern))) . '$/';
+
+		$packageFias = RarArchive::open($pathPackageFias);
+		//TODO: Exception
+		$listFiasFiles = $packageFias->getEntries();
+		//TODO: Exception
+		foreach ($listFiasFiles as $fileFias) {
+			if (!$fileFias->isDirectory() && preg_match($regexp, $fileFias->getName())) {
+			$return[] = $pathPackageFias.'#'.$fileFias->getName();
+		}
+
+		return $return;
 	}
 
 
