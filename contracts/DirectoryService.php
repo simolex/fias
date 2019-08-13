@@ -16,5 +16,6 @@ interface DirectoryService
 	public function getMaxDeltaVersion();
 	public function openStreamLocalFile(string $type, int $version, string $format);
 	public function closeStreamLocalFile(string $type, int $version, string $format);
+	public function findFullPathByPattern(string $pattern, string $type, int $version, string $format);
 
 }
