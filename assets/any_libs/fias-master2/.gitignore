@@ -1,0 +1,13 @@
+.idea
+vendor
+composer.lock
+.php_cs.cache
+
+tests/coverage
+
+staging/.vagrant
+staging/*.log
+staging/workdir
+
+
+.~lock.*
