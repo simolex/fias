@@ -1,0 +1,5 @@
+fields:
+    name:
+        label: 'salxig.test::lang.name'
+        span: auto
+        type: text

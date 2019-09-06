@@ -1,0 +1,5 @@
+fields:
+    switch1:
+        label: Switch
+        span: auto
+        type: switch

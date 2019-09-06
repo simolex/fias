@@ -1,0 +1,10 @@
+name: Fileinfo
+form: $/salxig/getfias/models/fias_fileinfo/get_fileinfo.yaml
+modelClass: Salxig\Getfias\Models\Fias_fileinfo
+defaultRedirect: salxig/getfias/fileinfo
+create:
+    redirect: 'salxig/getfias/fileinfo/update/:id'
+    redirectClose: salxig/getfias/fileinfo
+update:
+    redirect: salxig/getfias/fileinfo
+    redirectClose: salxig/getfias/fileinfo

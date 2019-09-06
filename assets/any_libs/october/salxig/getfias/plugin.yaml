@@ -1,0 +1,16 @@
+plugin:
+    name: 'salxig.getfias::lang.plugin.name'
+    description: 'salxig.getfias::lang.plugin.description'
+    author: salxig
+    icon: oc-icon-upload
+    homepage: ''
+navigation:
+    main-fias:
+        label: 'salxig.getfias::lang.menu.fias'
+        url: /salxig/getfias/fileinfo
+        icon: icon-location-arrow
+        sideMenu:
+            fias_fileinfo:
+                label: 'salxig.getfias::lang.menu.fileinfo'
+                url: salxig/getfias/fileinfo
+                icon: icon-undo

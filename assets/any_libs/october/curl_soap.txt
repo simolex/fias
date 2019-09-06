@@ -1,0 +1,44 @@
+<?php
+header( 'Content-Type: text/plain' );
+ 
+define( 'USE_LOCAL', false );
+ 
+$local_url    = 'http://node.local/~max/raw_post.php';
+$fias_url     = 'http://fias.nalog.ru/WebServices/Public/DownloadService.asmx';
+$fias_methods = (object) [
+    'all'  => 'GetAllDownloadFileInfo',
+    'last' => 'GetLastDownloadFileInfo'
+];
+ 
+$fias_method  = $fias_methods->last;
+$fias_request = <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+  <soap12:Body>
+    <{$fias_method} xmlns="{$fias_url}" />
+  </soap12:Body>
+</soap12:Envelope>
+XML;
+ 
+$url = ( USE_LOCAL ? $local_url : $fias_url );
+ 
+$curl = curl_init( $url );
+ 
+$headers = [
+    'Content-Type: text/xml; charset=utf-8',
+    "SOAPAction: \"$fias_url/$fias_method\"",
+    'Content-Length: ' . strlen( $fias_request ),
+];
+curl_setopt_array( $curl,
+                   [
+                       CURLOPT_POST           => true,
+                       CURLOPT_HEADER         => false,
+                       CURLOPT_RETURNTRANSFER => true,
+                       CURLOPT_HTTPHEADER     => $headers,
+                       CURLOPT_POSTFIELDS     => $fias_request
+                   ] );
+ 
+$res = curl_exec( $curl );
+ 
+curl_close( $curl );
+echo $res;

@@ -1,0 +1,31 @@
+columns:
+    ver_id:
+        label: salxig.getfias::lang.fileinfo.ver_id
+        type: number
+    text_version:
+        label: 'salxig.getfias::lang.fileinfo.text_ver'
+        type: text
+    complete_xml_url:
+        label: 'salxig.getfias::lang.fileinfo.com_xml_url'
+        type: text
+    complete_dbf_url:
+        label: 'salxig.getfias::lang.fileinfo.com_dbf_url'
+        type: text
+    delta_xml_url:
+        label: 'salxig.getfias::lang.fileinfo.del_xml_url'
+        type: text
+    delta_dbf_url:
+        label: 'salxig.getfias::lang.fileinfo.del_dbf_url'
+        type: text
+    uploaded:
+        label: uploaded
+        type: text
+    readed:
+        label: readed
+        type: text
+    created_at:
+        label: created_at
+        type: datetime
+    updated_at:
+        label: updated_at
+        type: datetime

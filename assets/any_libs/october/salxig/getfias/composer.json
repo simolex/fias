@@ -1,0 +1,15 @@
+{
+  "name": "salxig/getfias",
+  "type": "october-plugin",
+  "description": "OctoberCMS plugin for FIAS",
+  "homepage": "",
+  "authors": [
+    {
+      "name": "SalXiG",
+      "email": "salxig@m.com"
+    }
+  ],
+  "require": {
+        "artisaninweb/laravel-soap": "0.3.*"
+    }
+}

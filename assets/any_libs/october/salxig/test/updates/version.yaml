@@ -1,0 +1,8 @@
+1.0.1:
+    - 'Initialize plugin.'
+1.0.2:
+    - 'Created table salxig_test_units'
+    - builder_table_create_salxig_test_units.php
+1.0.3:
+    - 'Updated table salxig_test_units'
+    - builder_table_update_salxig_test_units.php

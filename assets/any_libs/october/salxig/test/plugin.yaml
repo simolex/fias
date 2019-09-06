@@ -1,0 +1,11 @@
+plugin:
+    name: 'salxig.test::lang.plugin.name'
+    description: 'salxig.test::lang.plugin.description'
+    author: salxig
+    icon: oc-icon-angellist
+    homepage: ''
+navigation:
+    main-menu-item:
+        label: 'salxig.test::lang.test.invent'
+        url: /
+        icon: icon-life-ring

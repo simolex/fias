@@ -1,0 +1,11 @@
+1.0.1:
+    - 'Initialize plugin.'
+1.0.2:
+    - 'Created table salxig_getfias_fileinfo'
+    - builder_table_create_salxig_getfias_fileinfo.php
+1.0.3:
+    - 'Updated table salxig_getfias_fileinfo'
+    - builder_table_update_salxig_getfias_fileinfo.php
+1.0.4:
+    - 'Updated table salxig_getfias_fileinfo'
+    - builder_table_update_salxig_getfias_fileinfo_2.php
